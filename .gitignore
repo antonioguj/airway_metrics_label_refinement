@@ -1,0 +1,6 @@
+# Python cache
+*.pyc
+*__pycache__*
+
+# Pycharm
+.idea/
