@@ -24,10 +24,10 @@ class MetricBase(object):
     def __init__(self) -> None:
         self._name_fun_out = None
 
-    def compute(self, target: np.ndarray, input: np.ndarray, **kwargs) -> np.ndarray:
+    def compute(self, target: np.ndarray, input: np.ndarray, *args) -> np.ndarray:
         if self._is_airway_metric:
-            target_cenline = kwargs['target_cenline']
-            input_cenline = kwargs['input_cenline']
+            target_cenline = args[0]
+            input_cenline = args[1]
             return self._compute_airs(target, target_cenline, input, input_cenline)
         else:
             return self._compute(target, input)

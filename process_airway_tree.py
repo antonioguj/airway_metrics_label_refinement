@@ -8,24 +8,18 @@ from functionsutil import makedir, basename, join_path_names, list_files_dir, co
 def main():
 
     # SETTINGS
-    input_refer_images_dir = join_path_names(args.datadir, './Images')
-    input_coarse_airways_dir = join_path_names(args.datadir, './CoarseAirways')
+    input_refer_images_dir = join_path_names(args.refer_datadir, './Images')
+    input_coarse_airways_dir = join_path_names(args.refer_datadir, './CoarseAirways')
 
-    def template_output_filenames(in_posterior_file: str, in_threshold: float):
-        return basename(in_posterior_file) + '_binmask_thres%s.nii.gz' % (in_threshold)
-
-    def template_output_centrelines_filenames(in_binary_mask_file: str):
-        return basename(in_binary_mask_file) + '_cenlines.nii.gz'
-
-    def get_casename_filename(in_posterior_file: str):
-        suffix_name = '#####'   # IF POSTERIOR FILES HAVE A SUFFIX, PUT HERE
-        return basename(in_posterior_file).replace('.nii.gz', '').replace(suffix_name, '')
+    def get_casename_filename(in_filename: str):
+        suffix_name = '_probmap'    # IF POSTERIOR FILES HAVE A SUFFIX, PUT HERE
+        return basename(in_filename).replace(suffix_name + '.nii.gz', '')
     # --------
 
     makedir(args.output_dir)
 
-    if args.is_calc_centrelines:
-        makedir(args.output_centrelines_dir)
+    if args.is_calc_cenlines:
+        makedir(args.output_cenlines_dir)
 
     list_input_posteriors_files = list_files_dir(args.input_dir)
     # list_input_refer_images_files = list_files_dir(input_refer_images_dir)
@@ -44,7 +38,7 @@ def main():
 
         in_posterior = ImageFileReader.get_image(in_posterior_file)
 
-        print("Compute Binary Masks thresholded to \'%s\'..." % (args.post_threshold_value))
+        print("Compute Binary Masks thresholded to \'%s\'..." % (args.value_threshold))
 
         out_binary_mask = compute_thresholded_image(in_posterior, args.value_threshold)
 
@@ -70,40 +64,40 @@ def main():
 
         # ---------------
 
-        if args.is_calc_centrelines:
+        if args.is_calc_cenlines:
             print("Compute the Centrelines from the Binary Masks by thinning operation...")
-            out_centrelines = compute_centrelines_mask(out_binary_mask)
+            out_cenlines_mask = compute_centrelines_mask(out_binary_mask)
         else:
-            out_centrelines = None
+            out_cenlines_mask = None
 
         # ---------------
 
-        output_binary_mask_file = join_path_names(args.output_dir,
-                                                  template_output_filenames(in_posterior_file, args.value_threshold))
-        print("Output: \'%s\', of dims \'%s\'..." % (basename(output_binary_mask_file), str(out_binary_mask.shape)))
+        out_binmask_file = in_casename + '_binmask.nii.gz'
+        out_binmask_file = join_path_names(args.output_dir, out_binmask_file)
+        print("Output: \'%s\', of dims \'%s\'..." % (basename(out_binmask_file), str(out_binary_mask.shape)))
 
-        ImageFileReader.write_image(output_binary_mask_file, out_binary_mask, metadata=in_metadata_file)
+        ImageFileReader.write_image(out_binmask_file, out_binary_mask, metadata=in_metadata_file)
 
-        if args.is_calc_centrelines:
-            output_centrelines_file = join_path_names(args.output_centrelines_dir,
-                                                      template_output_centrelines_filenames(output_binary_mask_file))
-            print("Output: \'%s\', of dims \'%s\'..." % (basename(output_centrelines_file), str(out_centrelines.shape)))
+        if args.is_calc_cenlines:
+            out_cenlines_file = in_casename + '_binmask_cenlines.nii.gz'
+            out_cenlines_file = join_path_names(args.output_cenlines_dir, out_cenlines_file)
+            print("Output: \'%s\', of dims \'%s\'..." % (basename(out_cenlines_file), str(out_cenlines_mask.shape)))
 
-            ImageFileReader.write_image(output_centrelines_file, out_centrelines, metadata=in_metadata_file)
+            ImageFileReader.write_image(out_cenlines_file, out_cenlines_mask, metadata=in_metadata_file)
     # endfor
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('input_dir', type=str)
-    parser.add_argument('--datadir', type=str, default='./BaseData/')
+    parser.add_argument('--refer_datadir', type=str, default='./ReferenceData/')
+    parser.add_argument('--input_dir', type=str, default='./Posteriors/')
     parser.add_argument('--output_dir', type=str, default='./BinaryMasks/')
     parser.add_argument('--value_threshold', type=float, default=0.5)
     parser.add_argument('--is_attach_coarse_airways', type=bool, default=True)
-    parser.add_argument('--is_calc_connected_tree', type=bool, default=True)
+    parser.add_argument('--is_calc_connected_tree', type=bool, default=False)
     parser.add_argument('--in_connectivity_dim', type=int, default=3)
-    parser.add_argument('--is_calc_centrelines', type=bool, default=True)
-    parser.add_argument('--output_centrelines_dir', type=str, default='./Centrelines/')
+    parser.add_argument('--is_calc_cenlines', type=bool, default=True)
+    parser.add_argument('--output_cenlines_dir', type=str, default='./Centrelines/')
     args = parser.parse_args()
 
     main()

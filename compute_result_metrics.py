@@ -19,10 +19,10 @@ LIST_CALC_METRICS_DEFAULT = ['DiceCoefficient',
 def main():
 
     # SETTINGS
-    # input_reference_images_dir = join_path_names(args.datadir, './Images')
-    input_reference_masks_dir = join_path_names(args.basedir, './Airways')
-    input_reference_cenlines_dir = join_path_names(args.basedir, './Centrelines')
-    input_coarse_airways_dir = join_path_names(args.basedir, './CoarseAirways')
+    # input_reference_images_dir = join_path_names(args.refer_datadir, './Images')
+    input_reference_masks_dir = join_path_names(args.refer_datadir, './Airways')
+    input_reference_cenlines_dir = join_path_names(args.refer_datadir, './Centrelines')
+    input_coarse_airways_dir = join_path_names(args.refer_datadir, './CoarseAirways')
 
     def get_casename_filename(in_predicted_mask_file: str):
         return basename(in_predicted_mask_file).replace('_binmask.nii.gz', '')
@@ -121,10 +121,10 @@ def main():
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('input_masks_dir', type=str)
-    parser.add_argument('input_cenlines_dir', type=str)
-    parser.add_argument('--datadir', type=str, default='./BaseData/')
-
+    parser.add_argument('--refer_datadir', type=str, default='./ReferenceData/')
+    parser.add_argument('--input_masks_dir', type=str, default='./BinaryMasks/')
+    parser.add_argument('--input_cenlines_dir', type=str, default='./Centrelines/')
+    parser.add_argument('--list_type_metrics', type=str, nargs='*', default=LIST_CALC_METRICS_DEFAULT)
     parser.add_argument('--output_file', type=str, default='./result_metrics.csv')
     parser.add_argument('--is_remove_trachea_calc_metrics', type=bool, default=True)
     args = parser.parse_args()
