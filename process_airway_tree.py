@@ -2,13 +2,15 @@
 import argparse
 
 from functionsutil import makedir, basename, join_path_names, list_files_dir, compute_thresholded_image, \
-    compute_merged_two_masks, compute_largest_connected_tree, compute_centrelines_mask, ImageFileReader
+    compute_merged_two_masks, compute_multiplied_two_masks, compute_largest_connected_tree, compute_centrelines_mask, \
+    ImageFileReader
 
 
 def main():
 
     # SETTINGS
     input_refer_images_dir = join_path_names(args.refer_datadir, './Images')
+    input_roimasks_dir = join_path_names(args.refer_datadir, './Lungs')
     input_coarse_airways_dir = join_path_names(args.refer_datadir, './CoarseAirways')
 
     def get_casename_filename(in_filename: str):
@@ -37,6 +39,19 @@ def main():
         in_metadata_file = ImageFileReader.get_image_metadata_info(in_refer_image_file)
 
         in_posterior = ImageFileReader.get_image(in_posterior_file)
+
+        # ---------------
+
+        if args.is_mask_region_interest:
+            print("Input data to Network were masked to ROI (lungs) -> Reverse mask in predictions...")
+            in_roimask_file = in_casename + '-lungs.nii.gz'
+            in_roimask_file = join_path_names(input_roimasks_dir, in_roimask_file)
+            print("ROI mask (lungs) file: \'%s\'..." % (basename(in_roimask_file)))
+
+            in_roimask = ImageFileReader.get_image(in_roimask_file)
+            in_posterior = compute_multiplied_two_masks(in_posterior, in_roimask)
+
+        # ---------------
 
         print("Compute Binary Masks thresholded to \'%s\'..." % (args.value_threshold))
 
@@ -93,6 +108,7 @@ if __name__ == '__main__':
     parser.add_argument('--input_dir', type=str, default='./Posteriors/')
     parser.add_argument('--output_dir', type=str, default='./BinaryMasks/')
     parser.add_argument('--value_threshold', type=float, default=0.5)
+    parser.add_argument('--is_mask_region_interest', type=bool, default=True)
     parser.add_argument('--is_attach_coarse_airways', type=bool, default=True)
     parser.add_argument('--is_calc_connected_tree', type=bool, default=False)
     parser.add_argument('--in_connectivity_dim', type=int, default=3)

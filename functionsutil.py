@@ -59,6 +59,11 @@ def compute_substracted_two_masks(in_image_1: np.ndarray, in_image_2: np.ndarray
     return np.clip(out_image, 0, 1).astype(in_image_1.dtype)
 
 
+def compute_multiplied_two_masks(in_image_1: np.ndarray, in_image_2: np.ndarray) -> np.ndarray:
+    out_image = np.multiply(in_image_1, in_image_2)
+    return np.clip(out_image, 0, 1)
+
+
 def compute_centrelines_mask(in_image: np.ndarray) -> np.ndarray:
     return skeletonize_3d(in_image.astype(np.uint8))
 

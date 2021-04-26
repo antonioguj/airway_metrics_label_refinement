@@ -53,6 +53,21 @@ class DiceCoefficient(MetricBase):
         return (2.0 * np.sum(target * input)) / (np.sum(target) + np.sum(input) + _SMOOTH)
 
 
+class DiceCoefficientMaskedTraining(MetricBase):
+
+    def __init__(self) -> None:
+        super(DiceCoefficientMaskedTraining, self).__init__()
+        self._name_fun_out = 'dice_masked'
+
+    def _get_masked_input(self, input: np.ndarray, target: np.ndarray) -> np.ndarray:
+        return np.where(target == -1, 0, input)
+
+    def _compute(self, target: np.ndarray, input: np.ndarray) -> np.ndarray:
+        target = self._get_masked_input(target, target)
+        input = self._get_masked_input(input, target)
+        return (2.0 * np.sum(target * input)) / (np.sum(target) + np.sum(input) + _SMOOTH)
+
+
 class AirwayCompleteness(MetricBase):
     _is_airway_metric = True
 
