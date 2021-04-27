@@ -63,8 +63,8 @@ class DiceCoefficientMaskedTraining(MetricBase):
         return np.where(target == -1, 0, input)
 
     def _compute(self, target: np.ndarray, input: np.ndarray) -> np.ndarray:
-        target = self._get_masked_input(target, target)
         input = self._get_masked_input(input, target)
+        target = self._get_masked_input(target, target)
         return (2.0 * np.sum(target * input)) / (np.sum(target) + np.sum(input) + _SMOOTH)
 
 
