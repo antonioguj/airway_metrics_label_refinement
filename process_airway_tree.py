@@ -104,6 +104,7 @@ def main():
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
+    parser.add_argument('--basedir', type=str, default='.')
     parser.add_argument('--refer_datadir', type=str, default='./ReferenceData/')
     parser.add_argument('--input_dir', type=str, default='./Posteriors/')
     parser.add_argument('--output_dir', type=str, default='./BinaryMasks/')
@@ -115,5 +116,10 @@ if __name__ == '__main__':
     parser.add_argument('--is_calc_cenlines', type=bool, default=True)
     parser.add_argument('--output_cenlines_dir', type=str, default='./Centrelines/')
     args = parser.parse_args()
+
+    args.refer_datadir = join_path_names(args.basedir, args.refer_datadir)
+    args.input_dir = join_path_names(args.basedir, args.input_dir)
+    args.output_dir = join_path_names(args.basedir, args.output_dir)
+    args.output_cenlines_dir = join_path_names(args.basedir, args.output_cenlines_dir)
 
     main()

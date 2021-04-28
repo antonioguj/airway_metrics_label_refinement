@@ -121,6 +121,7 @@ def main():
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
+    parser.add_argument('--basedir', type=str, default='.')
     parser.add_argument('--refer_datadir', type=str, default='./ReferenceData/')
     parser.add_argument('--input_masks_dir', type=str, default='./BinaryMasks/')
     parser.add_argument('--input_cenlines_dir', type=str, default='./Centrelines/')
@@ -128,5 +129,10 @@ if __name__ == '__main__':
     parser.add_argument('--output_file', type=str, default='./result_metrics.csv')
     parser.add_argument('--is_remove_trachea_calc_metrics', type=bool, default=True)
     args = parser.parse_args()
+
+    args.refer_datadir = join_path_names(args.basedir, args.refer_datadir)
+    args.input_masks_dir = join_path_names(args.basedir, args.input_masks_dir)
+    args.input_cenlines_dir = join_path_names(args.basedir, args.input_cenlines_dir)
+    args.output_file = join_path_names(args.basedir, args.output_file)
 
     main()
