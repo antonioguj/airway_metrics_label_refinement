@@ -28,6 +28,10 @@ def basename(pathname: str) -> str:
     return os.path.basename(pathname)
 
 
+def dirname(pathname: str) -> str:
+    return os.path.dirname(pathname)
+
+
 def list_files_dir(dirname: str, filename_pattern: str = '*') -> List[str]:
     return sorted(glob.glob(join_path_names(dirname, filename_pattern)))
 
