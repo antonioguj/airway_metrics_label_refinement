@@ -2,8 +2,7 @@
 from collections import OrderedDict
 import argparse
 
-from functionsutil import basename, join_path_names, list_files_dir, handle_error_message, compute_dilated_mask, \
-    compute_substracted_two_masks, ImageFileReader
+from functionsutil import *
 from metrics import get_metric
 
 LIST_CALC_METRICS_DEFAULT = ['DiceCoefficient',
