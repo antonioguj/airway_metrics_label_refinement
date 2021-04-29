@@ -99,19 +99,11 @@ class ImageFileReader(object):
     @classmethod
     def get_image(cls, filename: str) -> np.ndarray:
         out_image = nib.load(filename).get_data()
-        return cls._fix_dims_image_read(out_image)
+        return np.swapaxes(out_image, 0, 2)
 
     @classmethod
     def write_image(cls, filename: str, in_image: np.ndarray, **kwargs) -> None:
         affine = kwargs['metadata'] if 'metadata' in kwargs.keys() else None
-        in_image = cls._fix_dims_image_write(in_image)
+        in_image = np.swapaxes(in_image, 0, 2)
         nib_image = nib.Nifti1Image(in_image, affine)
         nib.save(nib_image, filename)
-
-    @staticmethod
-    def _fix_dims_image_read(in_image: np.ndarray) -> np.ndarray:
-        return np.swapaxes(in_image, 0, 2)
-
-    @staticmethod
-    def _fix_dims_image_write(in_image: np.ndarray) -> np.ndarray:
-        return np.swapaxes(in_image, 0, 2)
