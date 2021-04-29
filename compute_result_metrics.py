@@ -16,7 +16,7 @@ LIST_CALC_METRICS_DEFAULT = ['DiceCoefficient',
                              ]
 
 
-def main():
+def main(args):
 
     # SETTINGS
     # input_reference_images_dir = join_path_names(args.refer_datadir, './Images')
@@ -135,4 +135,4 @@ if __name__ == '__main__':
     args.input_cenlines_dir = join_path_names(args.basedir, args.input_cenlines_dir)
     args.output_file = join_path_names(args.basedir, args.output_file)
 
-    main()
+    main(args)

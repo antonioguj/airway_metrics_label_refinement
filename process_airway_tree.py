@@ -6,7 +6,7 @@ from functionsutil import makedir, basename, join_path_names, list_files_dir, co
     ImageFileReader
 
 
-def main():
+def main(args):
 
     # SETTINGS
     input_refer_images_dir = join_path_names(args.refer_datadir, './Images')
@@ -122,4 +122,4 @@ if __name__ == '__main__':
     args.output_dir = join_path_names(args.basedir, args.output_dir)
     args.output_cenlines_dir = join_path_names(args.basedir, args.output_cenlines_dir)
 
-    main()
+    main(args)
