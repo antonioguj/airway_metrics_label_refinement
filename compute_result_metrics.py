@@ -106,7 +106,7 @@ def main(args):
     # endfor
 
     # write out computed metrics in file
-    fout = open(args.output_file, 'w')
+    fout = open(args.output_result_file, 'w')
     strheader = ', '.join(['/case/'] + ['/%s/' % (key) for key in list_metrics.keys()]) + '\n'
     fout.write(strheader)
 
@@ -120,18 +120,19 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--basedir', type=str, default='.')
-    parser.add_argument('--refer_datadir', type=str, default='./ReferenceData/')
+    parser.add_argument('--input_basedir', type=str, default='.')
+    # parser.add_argument('--refer_datadir', type=str, default='./ReferenceData/')
     parser.add_argument('--input_masks_dir', type=str, default='./BinaryMasks/')
     parser.add_argument('--input_cenlines_dir', type=str, default='./Centrelines/')
     parser.add_argument('--list_type_metrics', type=str, nargs='*', default=LIST_CALC_METRICS_DEFAULT)
-    parser.add_argument('--output_file', type=str, default='./result_metrics.csv')
+    parser.add_argument('--output_result_file', type=str, default='./result_metrics.csv')
     parser.add_argument('--is_remove_trachea_calc_metrics', type=bool, default=True)
     args = parser.parse_args()
 
-    args.refer_datadir = join_path_names(args.basedir, args.refer_datadir)
-    args.input_masks_dir = join_path_names(args.basedir, args.input_masks_dir)
-    args.input_cenlines_dir = join_path_names(args.basedir, args.input_cenlines_dir)
-    args.output_file = join_path_names(args.basedir, args.output_file)
+    args.refer_datadir = '/mnt/mydrive/PythonCodes/Airway_segmentation/resources/THIRONA_Fullsize/'
+
+    args.input_masks_dir = join_path_names(args.input_basedir, args.input_masks_dir)
+    args.input_cenlines_dir = join_path_names(args.input_basedir, args.input_cenlines_dir)
+    args.output_result_file = join_path_names(args.input_basedir, args.output_result_file)
 
     main(args)

@@ -16,12 +16,12 @@ def main(args):
         return basename(in_filename).replace(suffix_name + '.nii.gz', '')
     # --------
 
-    makedir(args.output_dir)
+    makedir(args.output_masks_dir)
 
     if args.is_calc_cenlines:
         makedir(args.output_cenlines_dir)
 
-    list_input_posteriors_files = list_files_dir(args.input_dir)
+    list_input_posteriors_files = list_files_dir(args.input_posters_dir)
     # list_input_refer_images_files = list_files_dir(input_refer_images_dir)
     # list_input_coarse_airways_files = list_files_dir(input_coarse_airways_dir)
 
@@ -86,7 +86,7 @@ def main(args):
         # ---------------
 
         out_binmask_file = in_casename + '_binmask.nii.gz'
-        out_binmask_file = join_path_names(args.output_dir, out_binmask_file)
+        out_binmask_file = join_path_names(args.output_masks_dir, out_binmask_file)
         print("Output: \'%s\', of dims \'%s\'..." % (basename(out_binmask_file), str(out_binary_mask.shape)))
 
         ImageFileReader.write_image(out_binmask_file, out_binary_mask, metadata=in_metadata_file)
@@ -102,10 +102,10 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--basedir', type=str, default='.')
-    parser.add_argument('--refer_datadir', type=str, default='./ReferenceData/')
-    parser.add_argument('--input_dir', type=str, default='./Posteriors/')
-    parser.add_argument('--output_dir', type=str, default='./BinaryMasks/')
+    parser.add_argument('--input_basedir', type=str)
+    # parser.add_argument('--refer_datadir', type=str, default='./ReferenceData/')
+    parser.add_argument('--input_posters_dir', type=str, default='./Posteriors/')
+    parser.add_argument('--output_masks_dir', type=str, default='./BinaryMasks/')
     parser.add_argument('--value_threshold', type=float, default=0.5)
     parser.add_argument('--is_mask_region_interest', type=bool, default=True)
     parser.add_argument('--is_attach_coarse_airways', type=bool, default=True)
@@ -115,9 +115,10 @@ if __name__ == '__main__':
     parser.add_argument('--output_cenlines_dir', type=str, default='./Centrelines/')
     args = parser.parse_args()
 
-    args.refer_datadir = join_path_names(args.basedir, args.refer_datadir)
-    args.input_dir = join_path_names(args.basedir, args.input_dir)
-    args.output_dir = join_path_names(args.basedir, args.output_dir)
-    args.output_cenlines_dir = join_path_names(args.basedir, args.output_cenlines_dir)
+    args.refer_datadir = '/mnt/mydrive/PythonCodes/Airway_segmentation/resources/THIRONA_Fullsize/'
+
+    args.input_posters_dir = join_path_names(args.input_basedir, args.input_posters_dir)
+    args.output_masks_dir = join_path_names(args.input_basedir, args.output_masks_dir)
+    args.output_cenlines_dir = join_path_names(args.input_basedir, args.output_cenlines_dir)
 
     main(args)
