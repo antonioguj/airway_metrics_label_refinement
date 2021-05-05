@@ -2,6 +2,7 @@
 import argparse
 
 from functionsutil import *
+from filereaders import ImageFileReader
 
 
 def main(args):
@@ -102,7 +103,7 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--input_basedir', type=str)
+    parser.add_argument('input_basedir', type=str)
     # parser.add_argument('--refer_datadir', type=str, default='./ReferenceData/')
     parser.add_argument('--input_posters_dir', type=str, default='./Posteriors/')
     parser.add_argument('--output_masks_dir', type=str, default='./BinaryMasks/')
