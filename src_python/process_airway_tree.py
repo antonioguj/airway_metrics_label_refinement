@@ -1,8 +1,8 @@
 
 import argparse
 
-from functionsutil import *
-from filereaders import ImageFileReader
+from common.functionutil import *
+from common.filereader import NiftiFileReader
 
 
 def main(args):
@@ -35,9 +35,9 @@ def main(args):
         in_refer_image_file = in_casename + '.nii.gz'
         in_refer_image_file = join_path_names(input_refer_images_dir, in_refer_image_file)
 
-        in_metadata_file = ImageFileReader.get_image_metadata_info(in_refer_image_file)
+        in_metadata_file = NiftiFileReader.get_image_metadata_info(in_refer_image_file)
 
-        in_posterior = ImageFileReader.get_image(in_posterior_file)
+        in_posterior = NiftiFileReader.get_image(in_posterior_file)
 
         # ---------------
 
@@ -47,7 +47,7 @@ def main(args):
             in_roimask_file = join_path_names(input_roimasks_dir, in_roimask_file)
             print("ROI mask (lungs) file: \'%s\'..." % (basename(in_roimask_file)))
 
-            in_roimask = ImageFileReader.get_image(in_roimask_file)
+            in_roimask = NiftiFileReader.get_image(in_roimask_file)
             in_posterior = compute_multiplied_two_masks(in_posterior, in_roimask)
 
         # ---------------
@@ -65,7 +65,7 @@ def main(args):
             in_coarse_airways_file = join_path_names(input_coarse_airways_dir, in_coarse_airways_file)
             print("Coarse Airways mask file: \'%s\'..." % (basename(in_coarse_airways_file)))
 
-            in_coarse_airways = ImageFileReader.get_image(in_coarse_airways_file)
+            in_coarse_airways = NiftiFileReader.get_image(in_coarse_airways_file)
 
             out_binary_mask = compute_merged_two_masks(out_binary_mask, in_coarse_airways)
 
@@ -88,16 +88,16 @@ def main(args):
 
         out_binmask_file = in_casename + '_binmask.nii.gz'
         out_binmask_file = join_path_names(args.output_masks_dir, out_binmask_file)
-        print("Output: \'%s\', of dims \'%s\'..." % (basename(out_binmask_file), str(out_binary_mask.shape)))
+        print("Output: \'%s\'..." % (basename(out_binmask_file)))
 
-        ImageFileReader.write_image(out_binmask_file, out_binary_mask, metadata=in_metadata_file)
+        NiftiFileReader.write_image(out_binmask_file, out_binary_mask, metadata=in_metadata_file)
 
         if args.is_calc_cenlines:
             out_cenlines_file = in_casename + '_binmask_cenlines.nii.gz'
             out_cenlines_file = join_path_names(args.output_cenlines_dir, out_cenlines_file)
-            print("Output: \'%s\', of dims \'%s\'..." % (basename(out_cenlines_file), str(out_cenlines_mask.shape)))
+            print("Output: \'%s\'..." % (basename(out_cenlines_file)))
 
-            ImageFileReader.write_image(out_cenlines_file, out_cenlines_mask, metadata=in_metadata_file)
+            NiftiFileReader.write_image(out_cenlines_file, out_cenlines_mask, metadata=in_metadata_file)
     # endfor
 
 

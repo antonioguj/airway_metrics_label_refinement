@@ -1,6 +1,5 @@
 
 from typing import List
-
 import numpy as np
 from scipy.ndimage.morphology import binary_erosion, binary_dilation
 from skimage.morphology import skeletonize_3d

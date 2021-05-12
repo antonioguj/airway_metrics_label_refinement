@@ -2,9 +2,9 @@
 from collections import OrderedDict
 import argparse
 
-from functionsutil import *
-from filereaders import ImageFileReader
-from metrics import get_metric
+from common.functionutil import *
+from common.filereader import NiftiFileReader
+from common.metrics import get_metric
 
 LIST_CALC_METRICS_DEFAULT = ['DiceCoefficient',
                              'AirwayCompleteness',
@@ -63,10 +63,10 @@ def main(args):
         in_reference_cenline_file = join_path_names(input_reference_cenlines_dir, in_reference_cenline_file)
         print("Reference centrelines file: \'%s\'..." % (basename(in_reference_cenline_file)))
 
-        in_predicted_mask = ImageFileReader.get_image(in_predicted_mask_file)
-        in_predicted_cenline = ImageFileReader.get_image(in_predicted_cenline_file)
-        in_reference_mask = ImageFileReader.get_image(in_reference_mask_file)
-        in_reference_cenline = ImageFileReader.get_image(in_reference_cenline_file)
+        in_predicted_mask = NiftiFileReader.get_image(in_predicted_mask_file)
+        in_predicted_cenline = NiftiFileReader.get_image(in_predicted_cenline_file)
+        in_reference_mask = NiftiFileReader.get_image(in_reference_mask_file)
+        in_reference_cenline = NiftiFileReader.get_image(in_reference_cenline_file)
 
         # ---------------
 
@@ -77,7 +77,7 @@ def main(args):
             in_coarse_airways_file = join_path_names(input_coarse_airways_dir, in_coarse_airways_file)
             print("Coarse Airways mask file: \'%s\'..." % (basename(in_coarse_airways_file)))
 
-            in_coarse_airways = ImageFileReader.get_image(in_coarse_airways_file)
+            in_coarse_airways = NiftiFileReader.get_image(in_coarse_airways_file)
 
             print("Dilate coarse airways masks 4 levels to remove completely the trachea and main bronchi from "
                   "the predictions and the ground-truth...")
@@ -95,7 +95,7 @@ def main(args):
 
         for (imetric_name, imetric) in list_metrics.items():
             if imetric._is_use_voxelsize:
-                in_mask_voxel_size = ImageFileReader.get_image_voxelsize(in_predicted_mask_file)
+                in_mask_voxel_size = NiftiFileReader.get_image_voxelsize(in_predicted_mask_file)
                 imetric.set_voxel_size(in_mask_voxel_size)
 
             outval_metric = imetric.compute(in_reference_mask, in_predicted_mask,
