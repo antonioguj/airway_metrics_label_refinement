@@ -87,7 +87,7 @@ def generate_error_blank_branch_cylinder(inout_mask: np.ndarray,
 
     # conditions for cylinder: 1) if distance to center, parallel to axis, is less than length_axis
     #                          2) if distance to center, perpendicular to axis, is less than radius_base
-    dist_rel2center_parall_axis_candits = np.dot(locs_rel2center_candits, unit_vector_axis)
+    dist_rel2center_parall_axis_candits = np.abs(np.dot(locs_rel2center_candits, unit_vector_axis))
 
     is_indexes_inside_blank_parall = dist_rel2center_parall_axis_candits <= half_length_axis
     is_indexes_inside_blank_perpen = np.sqrt(np.square(np.linalg.norm(locs_rel2center_candits, axis=3))
