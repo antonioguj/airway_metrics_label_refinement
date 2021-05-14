@@ -187,7 +187,7 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--inbasedir', type=str, default='.')
-    parser.add_argument('--is_gener_error_type1', type=bool, default=False)
+    parser.add_argument('--is_gener_error_type1', type=bool, default=True)
     parser.add_argument('--prop_branches_error_type1', type=float, default=0.3)
     parser.add_argument('--is_gener_error_type2', type=bool, default=True)
     parser.add_argument('--prop_branches_error_type2', type=float, default=1.0)
