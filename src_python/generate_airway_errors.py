@@ -4,7 +4,8 @@ import argparse
 
 from common.functionutil import *
 from common.filereader import NiftiFileReader, CsvFileReader
-from common.genererrors import get_vector_two_points, get_norm_vector, get_point_in_segment, generate_error_blank_branch
+from common.genererrors import get_vector_two_points, get_norm_vector, get_point_in_segment, \
+    generate_error_blank_branch_sphere, generate_error_blank_branch_cylinder
 
 
 def main(args):
@@ -111,14 +112,14 @@ def main(args):
             min_length_blank = 1.0 / in_voxelnorm_image     # min length 1 mm
             length_axis_blank = max(np.random.random() * length_branch, min_length_blank)
 
-            params_blank_shape = {'vector_axis': vector_axis_branch,
-                                  'diam_base': 3 * inner_diam_branch,
-                                  'length_axis': length_axis_blank}
+            # overestimate the blank dimension, to avoid that small parts remain
+            diam_base_blank = 3 * inner_diam_branch
 
-            inout_airway_mask = generate_error_blank_branch(inout_airway_mask,
-                                                            loc_center_blank_branch,
-                                                            type_blank_shape='cylinder',
-                                                            params_blank_shape=params_blank_shape)
+            inout_airway_mask = generate_error_blank_branch_cylinder(inout_airway_mask,
+                                                                     loc_center_blank_branch,
+                                                                     vector_axis_branch,
+                                                                     diam_base_blank,
+                                                                     length_axis_blank)
         # endfor
 
         # ********************
@@ -164,14 +165,15 @@ def main(args):
             vector_begin_end_blank_branch = get_vector_two_points(loc_begin_blank_branch, end_point_branch)
             length_axis_blank = get_norm_vector(vector_begin_end_blank_branch)
 
-            params_blank_shape = {'vector_axis': vector_axis_branch,
-                                  'diam_base': 3 * inner_diam_branch,
-                                  'length_axis': 1.2 * length_axis_blank}
+            # overestimate the blank dimension, to avoid that small parts remain
+            diam_base_blank = 3 * inner_diam_branch
+            length_axis_blank = 1.2 * length_axis_blank
 
-            inout_airway_mask = generate_error_blank_branch(inout_airway_mask,
-                                                            loc_center_blank_branch,
-                                                            type_blank_shape='cylinder',
-                                                            params_blank_shape=params_blank_shape)
+            inout_airway_mask = generate_error_blank_branch_cylinder(inout_airway_mask,
+                                                                     loc_center_blank_branch,
+                                                                     vector_axis_branch,
+                                                                     diam_base_blank,
+                                                                     length_axis_blank)
         # endfor
 
         # ---------------
