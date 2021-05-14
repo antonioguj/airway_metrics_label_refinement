@@ -10,6 +10,11 @@ def get_vector_two_points(begin_point: Tuple[float, float, float],
             end_point[1] - begin_point[1],
             end_point[2] - begin_point[2])
 
+
+def get_norm_vector(in_vector: Tuple[float, float, float]) -> float:
+    return np.linalg.norm(in_vector)
+
+
 def get_point_in_segment(begin_point: Tuple[float, float, float],
                          end_point: Tuple[float, float, float],
                          rel_dist_segm: float
@@ -60,18 +65,18 @@ def _get_indexes_inside_blank_cylinder(indexes_candits_inside_blank: np.ndarray,
     # relative distance of candidate indexes to center
     locs_rel2center_candits = indexes_candits_inside_blank - point_center
 
-    norm_vector_axis = np.sqrt(vector_axis.dot(vector_axis))
+    norm_vector_axis = np.sqrt(np.dot(vector_axis, vector_axis))
     unit_vector_axis = vector_axis / norm_vector_axis
     radius_base = diam_base / 2.0
     half_length_axis = length_axis / 2.0
 
     # conditions for cylinder: 1) if distance to center, parallel to axis, is less than length_axis
-    #                          2) if distance to center, percendicular to axis, is less than radius_base
+    #                          2) if distance to center, perpendicular to axis, is less than radius_base
     dist_rel2center_parall_axis_candits = np.dot(locs_rel2center_candits, unit_vector_axis)
 
     is_indexes_inside_blank_parall = dist_rel2center_parall_axis_candits <= half_length_axis
-    is_indexes_inside_blank_perpen = np.sqrt(np.square(np.linalg.norm(locs_rel2center_candits, axis=3), 2)
-                                             - np.square(dist_rel2center_parall_axis_candits, 2)) <= radius_base
+    is_indexes_inside_blank_perpen = np.sqrt(np.square(np.linalg.norm(locs_rel2center_candits, axis=3))
+                                             - np.square(dist_rel2center_parall_axis_candits)) <= radius_base
 
     is_indexes_inside_blank = np.logical_and(is_indexes_inside_blank_parall, is_indexes_inside_blank_perpen)
     # array of ['True', 'False'], with 'True' for indexes that are inside the blank
