@@ -15,6 +15,8 @@ def main(args):
     input_airway_measures_dir = join_path_names(args.inbasedir, './AirwayMeasurements')
     input_images_info_file = join_path_names(args.inbasedir, './images_info.csv')
 
+    list_cases_excluded_issues = ['026_023']
+
     def get_casename_filename(in_filename: str):
         return basename(in_filename).replace('_manual-airways.nii.gz', '')
     # --------
@@ -39,6 +41,10 @@ def main(args):
     for in_airway_mask_file in list_input_airway_masks:
         print("\nInput: \'%s\'..." % (basename(in_airway_mask_file)))
         in_casename = get_casename_filename(in_airway_mask_file)
+
+        if in_casename in list_cases_excluded_issues:
+            print("Exclude case \'%s\' because we found some issues... Continue" % (in_casename))
+            continue
 
         in_airway_measures_file = in_casename + '_ResultsPerBranch.csv'
         in_airway_measures_file = join_path_names(input_airway_measures_dir, in_airway_measures_file)
@@ -190,7 +196,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--inbasedir', type=str, default='.')
     parser.add_argument('--is_gener_error_type1', type=bool, default=True)
-    parser.add_argument('--prop_branches_error_type1', type=float, default=0.3)
+    parser.add_argument('--prop_branches_error_type1', type=float, default=1.0)
     parser.add_argument('--is_gener_error_type2', type=bool, default=True)
     parser.add_argument('--prop_branches_error_type2', type=float, default=1.0)
     parser.add_argument('--random_seed', type=int, default=2017)
