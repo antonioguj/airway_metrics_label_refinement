@@ -5,7 +5,7 @@ import argparse
 from common.functionutil import *
 from common.filereader import NiftiFileReader, CsvFileReader
 from common.genererrors import get_vector_two_points, get_norm_vector, get_point_in_segment, \
-    generate_error_blank_branch_sphere, generate_error_blank_branch_cylinder
+    generate_error_blank_branch_cylinder
 
 
 def main(args):
@@ -44,6 +44,9 @@ def main(args):
 
         if in_casename in list_cases_excluded_issues:
             print("Exclude case \'%s\' because we found some issues... Continue" % (in_casename))
+            continue
+
+        if in_casename != '026_144':
             continue
 
         in_airway_measures_file = in_casename + '_ResultsPerBranch.csv'
@@ -92,7 +95,10 @@ def main(args):
             print("Generate errors of Type 1: blanking small regions in random branches...")
 
             num_branches_error = int(args.prop_branches_error_type1 * num_branches)
+            print("Num branches where to set errors: %s..." % (num_branches_error))
+
             indexes_branches_gener_error = np.random.choice(range(num_branches), num_branches_error, replace=False)
+            indexes_branches_gener_error = np.sort(indexes_branches_gener_error)
         else:
             indexes_branches_gener_error = []
 
@@ -115,8 +121,9 @@ def main(args):
             loc_center_blank_branch = get_point_in_segment(begin_point_branch, end_point_branch, reldist_center_blank)
 
             # random length of blank in axial dir
+            length_axis_blank = np.random.random() * length_branch
             min_length_blank = 1.0 / in_voxelnorm_image     # min length 1 mm
-            length_axis_blank = max(np.random.random() * length_branch, min_length_blank)
+            length_axis_blank = max(length_axis_blank, min_length_blank)
 
             # overestimate the blank dimension, to avoid that small parts remain
             diam_base_blank = 3 * inner_diam_branch
@@ -141,9 +148,11 @@ def main(args):
             num_termin_branches = len(in_airway_id_termin_branches)
 
             num_termin_branches_error = int(args.prop_branches_error_type2 * num_termin_branches)
+            print("Num branches where to set errors: %s..." % (num_termin_branches_error))
 
             indexes_branches_gener_error = \
                 np.random.choice(in_airway_id_termin_branches, num_termin_branches_error, replace=False)
+            indexes_branches_gener_error = np.sort(indexes_branches_gener_error)
         else:
             indexes_branches_gener_error = []
 
@@ -170,10 +179,10 @@ def main(args):
             loc_begin_blank_branch = get_point_in_segment(begin_point_branch, end_point_branch, reldist_begin_blank)
             vector_begin_end_blank_branch = get_vector_two_points(loc_begin_blank_branch, end_point_branch)
             length_axis_blank = get_norm_vector(vector_begin_end_blank_branch)
+            length_axis_blank = 1.2 * length_axis_blank
 
             # overestimate the blank dimension, to avoid that small parts remain
             diam_base_blank = 3 * inner_diam_branch
-            length_axis_blank = 1.2 * length_axis_blank
 
             inout_airway_mask = generate_error_blank_branch_cylinder(inout_airway_mask,
                                                                      loc_center_blank_branch,

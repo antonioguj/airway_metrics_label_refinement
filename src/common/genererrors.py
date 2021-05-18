@@ -73,8 +73,8 @@ def generate_error_blank_branch_sphere(inout_mask: np.ndarray,
     indexes_inside_blank = indexes_candits_inside_blank[is_indexes_inside_blank]
 
     # blank error: set '0' to voxels for indexes inside the blank
-    (indexes_x_blank, indexes_y_blank, indexes_z_blank) = np.transpose(indexes_inside_blank)
-    inout_mask[indexes_z_blank, indexes_y_blank, indexes_x_blank] = 0
+    (indexes_x_in, indexes_y_in, indexes_z_in) = np.transpose(indexes_inside_blank)
+    inout_mask[indexes_z_in, indexes_y_in, indexes_x_in] = 0
 
     return inout_mask
 
@@ -117,7 +117,7 @@ def generate_error_blank_branch_cylinder(inout_mask: np.ndarray,
     indexes_inside_blank = indexes_candits_inside_blank[is_indexes_inside_blank]
 
     # blank error: set '0' to voxels for indexes inside the blank
-    (indexes_x_blank, indexes_y_blank, indexes_z_blank) = np.transpose(indexes_inside_blank)
-    inout_mask[indexes_z_blank, indexes_y_blank, indexes_x_blank] = 0
+    (indexes_x_in, indexes_y_in, indexes_z_in) = np.transpose(indexes_inside_blank)
+    inout_mask[indexes_z_in, indexes_y_in, indexes_x_in] = 0
 
     return inout_mask
