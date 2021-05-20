@@ -8,12 +8,13 @@ from common.genererrors import get_vector_two_points, get_norm_vector, get_point
     generate_error_blank_branch_cylinder
 
 MIN_BRANCH_GENER_ERROR_T1 = 4
-FACTOR_GENERS_SAMPLE_PROBS_T1 = 2.0
 INFLATE_DIAM_ERROR_T1 = 4.0
+MAX_DIAM_ERROR_T1 = 30.0
 MIN_LENGTH_ERROR_T1 = 1.0
 INFLATE_LENGTH_ERROR_T1 = 1.0
 
 INFLATE_DIAM_ERROR_T2 = 6.0
+MAX_DIAM_ERROR_T2 = 30.0
 INFLATE_LENGTH_ERROR_T2 = 2.0
 
 
@@ -71,6 +72,9 @@ def main(args):
 
         inout_airway_mask = NiftiFileReader.get_image(in_airway_mask_file)
 
+        if args.is_test_blank_shapes:
+            inout_airway_mask = np.ones_like(inout_airway_mask)
+
         in_airway_measures = CsvFileReader.get_data(in_airway_measures_file)
 
         # ---------------
@@ -111,9 +115,10 @@ def main(args):
             print("Num branches with errors type1: %s..." % (num_branches_error))
 
             # use sample probability as twice the generation number, so that terminal branches have more likely errors
-            geners_sample_probs = [elem if elem >= MIN_BRANCH_GENER_ERROR_T1 else 0 for elem in in_generation_branches]
-            geners_sample_probs = np.array(geners_sample_probs) * FACTOR_GENERS_SAMPLE_PROBS_T1
-            geners_sample_probs = geners_sample_probs / np.sum(geners_sample_probs)
+            # exclude larger main branches
+            geners_sample_probs = [max(elem, MIN_BRANCH_GENER_ERROR_T1-1) - (MIN_BRANCH_GENER_ERROR_T1-1)
+                                   for elem in in_generation_branches]
+            geners_sample_probs = np.array(geners_sample_probs) / np.sum(geners_sample_probs)
 
             indexes_branches_gener_error = np.random.choice(range(num_branches), num_branches_error, replace=False,
                                                             p=geners_sample_probs)
@@ -141,6 +146,10 @@ def main(args):
 
             # diameter: the branch diameter (inflated several times)
             diam_base_blank = INFLATE_DIAM_ERROR_T1 * inner_diam_branch
+            if diam_base_blank > MAX_DIAM_ERROR_T1:
+                print("Warning: branch \'%s\' with too large diam: \'%s\'... Clipping it to: \'%s\'..."
+                      % (index_brh, diam_base_blank, MAX_DIAM_ERROR_T1))
+            diam_base_blank = min(diam_base_blank, MAX_DIAM_ERROR_T1)
 
             # length: random between min. 1mm and the branch length (inflated several times)
             length_axis_blank = np.random.random() * (INFLATE_LENGTH_ERROR_T1 * length_branch)
@@ -192,8 +201,12 @@ def main(args):
             reldist_center_blank = (reldist_begin_blank + 1.0) / 2.0
             loc_center_blank_branch = get_point_in_segment(begin_point_branch, end_point_branch, reldist_center_blank)
 
-            # diameter: the branch diameter (inflated several times)
+            # diameter: the branch diameter (inflated several times) (clip for terminal branches with wrong large diam)
             diam_base_blank = INFLATE_DIAM_ERROR_T2 * inner_diam_branch
+            if diam_base_blank > MAX_DIAM_ERROR_T2:
+                print("Warning: terminal branch \'%s\' with too large diam: \'%s\'... Clipping it to: \'%s\'..."
+                      % (index_brh, diam_base_blank, MAX_DIAM_ERROR_T2))
+            diam_base_blank = min(diam_base_blank, MAX_DIAM_ERROR_T2)
 
             # length: distance between start blank and end of the branch (inflated several times)
             loc_begin_blank_branch = get_point_in_segment(begin_point_branch, end_point_branch, reldist_begin_blank)
@@ -210,7 +223,13 @@ def main(args):
 
         # ---------------
 
+        if args.is_test_blank_shapes:
+            inout_airway_mask = np.ones_like(inout_airway_mask) - inout_airway_mask
+
         out_airway_error_mask_file = in_casename + '_airways-errors.nii.gz'
+        if args.is_test_blank_shapes:
+            out_airway_error_mask_file = in_casename + '_blank-shapes.nii.gz'
+
         out_airway_error_mask_file = join_path_names(args.output_dir, out_airway_error_mask_file)
         print("Output: \'%s\'..." % (basename(out_airway_error_mask_file)))
 
@@ -227,6 +246,7 @@ if __name__ == '__main__':
     parser.add_argument('--prop_branches_error_type2', type=float, default=0.8)
     parser.add_argument('--random_seed', type=int, default=2017)
     parser.add_argument('--output_dir', type=str, default='./AirwaysErrors/')
+    parser.add_argument('--is_test_blank_shapes', type=bool, default=False)
     args = parser.parse_args()
 
     args.output_dir = join_path_names(args.inbasedir, args.output_dir)
