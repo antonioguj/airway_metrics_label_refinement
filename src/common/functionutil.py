@@ -1,12 +1,14 @@
 
-from typing import List
+from typing import List, Union
 import numpy as np
+import glob
+import os
+import re
+import shutil
+import sys
 from scipy.ndimage.morphology import binary_erosion, binary_dilation
 from skimage.morphology import skeletonize_3d
 from skimage.measure import label
-import glob
-import os
-import sys
 
 
 def makedir(dirname: str) -> bool:
@@ -16,6 +18,10 @@ def makedir(dirname: str) -> bool:
         return True
     else:
         return False
+
+
+def copyfile(src_file: str, dest_file: str) -> None:
+    shutil.copyfile(src_file, dest_file)
 
 
 def join_path_names(pathname_1: str, pathname_2: str) -> str:
@@ -32,6 +38,18 @@ def dirname(pathname: str) -> str:
 
 def list_files_dir(dirname: str, filename_pattern: str = '*') -> List[str]:
     return sorted(glob.glob(join_path_names(dirname, filename_pattern)))
+
+
+def list_dirs_dir(dirname: str, dirname_pattern: str = '*') -> List[str]:
+    return list_files_dir(dirname, dirname_pattern)
+
+
+def get_substring_filename(filename: str, pattern_search: str) -> Union[str, None]:
+    sre_substring_filename = re.search(pattern_search, filename)
+    if sre_substring_filename:
+        return sre_substring_filename.group(0)
+    else:
+        return None
 
 
 def handle_error_message(message: str) -> None:

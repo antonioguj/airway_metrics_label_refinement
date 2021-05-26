@@ -71,7 +71,6 @@ class CsvFileReader(object):
                         in_value_str = row_data[ifie]
                         in_data_type = cls.get_data_type(in_value_str)
                         list_datatype_fields.append(in_data_type)
-                    # endfor
 
                 for ifie in range(num_fields):
                     field_name = list_fields[ifie]
@@ -90,7 +89,5 @@ class CsvFileReader(object):
                         out_value = in_value_str
 
                     out_dict_data[field_name].append(out_value)
-                # endfor
-            # endfor
 
         return out_dict_data
