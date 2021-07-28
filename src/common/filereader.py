@@ -1,5 +1,5 @@
 
-from typing import Tuple, Any
+from typing import List, Tuple, Dict, Any
 from collections import OrderedDict
 import numpy as np
 import nibabel as nib
@@ -49,15 +49,14 @@ class CsvFileReader(object):
             return 'string'
 
     @classmethod
-    def get_data(cls, input_file: str):
+    def get_data(cls, input_file: str) -> Dict[str, Any]:
         with open(input_file, 'r') as fin:
             csv_reader = csv.reader(fin, delimiter=',')
 
-            # read header and get field labels
-            list_fields = next(csv_reader)
+            list_fields = next(csv_reader)  # read header
             list_fields = [elem.lstrip() for elem in list_fields]  # remove empty leading spaces ' '
 
-            # output data as dictionary with (key: field_name, value: field data, same column)
+            # output data as dictionary (key: field name, value: field data column)
             out_dict_data = OrderedDict([(ifield, []) for ifield in list_fields])
 
             num_fields = len(list_fields)
@@ -91,3 +90,39 @@ class CsvFileReader(object):
                     out_dict_data[field_name].append(out_value)
 
         return out_dict_data
+
+    @classmethod
+    def write_data(cls, output_file: str, out_dict_data: Dict[str, Any], format_out_data: List[str] = None) -> None:
+        with open(output_file, 'w') as fout:
+
+            list_fields = list(out_dict_data.keys())
+            str_header = ', '.join(list_fields) + '\n'
+            fout.write(str_header)
+
+            list_out_list_data = list(out_dict_data.values())
+            num_cols = len(list_fields)
+            num_rows = len(list_out_list_data[0])
+
+            if format_out_data is None:
+                format_out_data = ['%0.3f'] * num_cols
+
+            for irow in range(num_rows):
+                list_data_row = [list_out_list_data[icol][irow] for icol in range(num_cols)]
+                str_data_row = ', '.join([format_out_data[i] % (elem) for i, elem in enumerate(list_data_row)]) + '\n'
+                fout.write(str_data_row)
+
+    @classmethod
+    def write_data_other(cls, output_file: str, out_dict_data: Dict[str, Any]) -> None:
+        with open(output_file, 'w') as fout:
+            csv_writer = csv.writer(fout, delimiter=',')
+
+            list_fields = list(out_dict_data.keys())
+            csv_writer.writerow(list_fields)
+
+            list_out_list_data = list(out_dict_data.values())
+            num_cols = len(list_fields)
+            num_rows = len(list_out_list_data[0])
+
+            for irow in range(num_rows):
+                list_data_row = [list_out_list_data[icol][irow] for icol in range(num_cols)]
+                csv_writer.writerow(list_data_row)

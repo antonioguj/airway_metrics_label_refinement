@@ -17,10 +17,16 @@ def get_norm_vector(in_vector: Tuple[float, float, float]) -> float:
     return np.linalg.norm(in_vector)
 
 
-def get_point_in_segment(begin_point: Tuple[float, float, float],
-                         end_point: Tuple[float, float, float],
-                         rel_dist_segm: float
-                         ) -> Tuple[float, float, float]:
+def get_distance_two_points(begin_point: Tuple[float, float, float],
+                            end_point: Tuple[float, float, float]
+                            ) -> Tuple[float, float, float]:
+    return get_norm_vector(get_vector_two_points(begin_point, end_point))
+
+
+def get_point_inside_segment(begin_point: Tuple[float, float, float],
+                             end_point: Tuple[float, float, float],
+                             rel_dist_segm: float
+                             ) -> Tuple[float, float, float]:
     vector_segment = get_vector_two_points(begin_point, end_point)
     return (begin_point[0] + rel_dist_segm * vector_segment[0],
             begin_point[1] + rel_dist_segm * vector_segment[1],
