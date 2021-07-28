@@ -95,7 +95,7 @@ def generate_error_blank_branch_cylinder(inout_mask: np.ndarray,
     unit_vector_axis = np.array(vector_axis) / norm_vector_axis
     radius_base = diam_base / 2.0
     half_length_axis = length_axis / 2.0
-    image_size = inout_mask.shape[::-1] # get correct format (dim_x, dim_y, dim_z)
+    image_size = inout_mask.shape[::-1] # get correct format (dx, dy, dz)
 
     # candidates: subset of all possible indexes where to check condition for blank shape -> to save time
     dist_corner_2center = np.sqrt(radius_base ** 2 + half_length_axis ** 2)
