@@ -4,7 +4,7 @@ import argparse
 
 from common.functionutil import *
 from common.filereader import NiftiFileReader, CsvFileReader
-from common.genererrors import get_vector_two_points, get_norm_vector, get_distance_two_points, \
+from common.errorgenerator import get_vector_two_points, get_norm_vector, get_distance_two_points, \
     get_point_inside_segment, generate_error_blank_branch_cylinder
 
 IS_EXCLUDE_SMALL_BRANCHES_ERROR_T1 = True
