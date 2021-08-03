@@ -20,11 +20,11 @@ def main(args):
         return basename(in_filename).replace('_ResultsPerBranch.csv', '')
     # --------
 
+    makedir(output_dir)
+
     list_input_airway_measures_files = list_files_dir(input_airway_measures_dir, '*.csv')
 
     input_crop_boundboxes = dict(np.load(input_crop_boundboxes_file, allow_pickle=True).item())
-
-    makedir(output_dir)
 
     in_images_info = CsvFileReader.get_data(input_images_info_file)
 
@@ -151,10 +151,10 @@ def main(args):
         # --------------------
 
         # output measures for left / right lungs in separate .csv files
-        in_airway_measures_file_left = basename(in_airway_measures_file).replace('.csv', '_LeftLung.csv')
+        in_airway_measures_file_left = in_casename + '_LeftLung_ResultsPerBranch.csv'
         in_airway_measures_file_left = join_path_names(output_dir, in_airway_measures_file_left)
 
-        in_airway_measures_file_right = basename(in_airway_measures_file).replace('.csv', '_RightLung.csv')
+        in_airway_measures_file_right = in_casename + '_RightLung_ResultsPerBranch.csv'
         in_airway_measures_file_right = join_path_names(output_dir, in_airway_measures_file_right)
 
         print("Output: \'%s\'..." % (basename(in_airway_measures_file_left)))

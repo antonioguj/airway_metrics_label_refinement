@@ -24,11 +24,13 @@ def main(args):
     input_airway_measures_dir = join_path_names(args.inbasedir, './AirwayMeasurements')
     input_images_info_file = join_path_names(args.inbasedir, './images_info.csv')
 
+    output_dir = join_path_names(args.inbasedir, './AirwaysErrors/')
+
     def get_casename_filename(in_filename: str):
         return basename(in_filename).replace('_manual-airways.nii.gz', '')
     # --------
 
-    makedir(args.output_dir)
+    makedir(output_dir)
 
     list_input_airway_mask_files = list_files_dir(input_airway_masks_dir)
     # list_input_airway_measures_files = list_files_dir(input_airway_measures_dir)
@@ -194,6 +196,7 @@ def main(args):
 
                 # position center blank: random along the branch
                 rel_pos_center_blank = np.random.random()
+                #rel_pos_center_blank = 0.5
                 loc_center_blank = get_point_inside_segment(begin_point_branch, end_point_branch, rel_pos_center_blank)
 
                 # diameter base blank: the branch diameter (inflated several times)
@@ -205,6 +208,7 @@ def main(args):
 
                 # length blank: random between min. (1 voxel) and the branch length
                 length_axis_blank = np.random.random() * length_branch
+                #length_axis_blank = length_branch
                 length_axis_blank = max(length_axis_blank, MIN_LENGTH_ERROR_T1)
 
                 inout_airway_mask = generate_error_blank_branch_cylinder(inout_airway_mask,
@@ -262,6 +266,7 @@ def main(args):
 
                 # position center blank: random in the first half of the branch
                 rel_pos_begin_blank = np.random.random() * 0.5
+                #rel_pos_begin_blank = 0.0
                 rel_pos_center_blank = (rel_pos_begin_blank + 1.0) / 2.0
                 loc_center_blank = get_point_inside_segment(begin_point_branch, end_point_branch, rel_pos_center_blank)
 
@@ -304,14 +309,14 @@ def main(args):
         if args.is_test_error_shapes:
             out_airway_error_mask_file = in_casename + '_test-error-shapes.nii.gz'
 
-        out_airway_error_mask_file = join_path_names(args.output_dir, out_airway_error_mask_file)
+        out_airway_error_mask_file = join_path_names(output_dir, out_airway_error_mask_file)
         print("Output: \'%s\'..." % (basename(out_airway_error_mask_file)))
 
         NiftiFileReader.write_image(out_airway_error_mask_file, inout_airway_mask, metadata=in_metadata_file)
 
         if args.is_output_error_measures:
             out_air_error_measures_file = in_casename + '_air-error-measures.csv'
-            out_air_error_measures_file = join_path_names(args.output_dir, out_air_error_measures_file)
+            out_air_error_measures_file = join_path_names(output_dir, out_air_error_measures_file)
             print("And: \'%s\'..." % (basename(out_air_error_measures_file)))
 
             CsvFileReader.write_data(out_air_error_measures_file, out_dict_air_error_measures,
@@ -327,11 +332,8 @@ if __name__ == '__main__':
     parser.add_argument('--is_generate_error_type2', type=bool, default=True)
     parser.add_argument('--prop_branches_error_type2', type=float, default=0.8)
     parser.add_argument('--random_seed', type=int, default=2017)
-    parser.add_argument('--output_dir', type=str, default='./AirwaysErrors/')
     parser.add_argument('--is_test_error_shapes', type=bool, default=False)
     parser.add_argument('--is_output_error_measures', type=bool, default=True)
     args = parser.parse_args()
-
-    args.output_dir = join_path_names(args.inbasedir, args.output_dir)
 
     main(args)
