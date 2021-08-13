@@ -49,7 +49,7 @@ class CsvFileReader(object):
             return 'string'
 
     @classmethod
-    def get_data(cls, input_file: str) -> Dict[str, Any]:
+    def get_data(cls, input_file: str) -> Dict[str, List[Any]]:
         with open(input_file, 'r') as fin:
             csv_reader = csv.reader(fin, delimiter=',')
 

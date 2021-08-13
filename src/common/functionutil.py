@@ -20,6 +20,10 @@ def makedir(dirname: str) -> bool:
         return False
 
 
+def makelink(src_file: str, dest_link: str) -> None:
+    os.symlink(src_file, dest_link)
+
+
 def copyfile(src_file: str, dest_file: str) -> None:
     shutil.copyfile(src_file, dest_file)
 
@@ -34,6 +38,10 @@ def basename(pathname: str) -> str:
 
 def dirname(pathname: str) -> str:
     return os.path.dirname(pathname)
+
+
+def basename_filenoext(filename: str) -> str:
+    return basename(filename).replace('.nii.gz', '')
 
 
 def list_files_dir(dirname: str, filename_pattern: str = '*') -> List[str]:
