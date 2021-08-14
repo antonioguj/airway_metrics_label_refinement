@@ -20,19 +20,45 @@ MAX_DIAM_ERROR_T2 = 30.0
 def main(args):
 
     # SETTINGS
-    input_airway_masks_dir = join_path_names(args.inbasedir, './Airways')
+    input_airway_labels_dir = join_path_names(args.inbasedir, './LabelsWorkData')
     input_airway_measures_dir = join_path_names(args.inbasedir, './AirwayMeasurements')
     input_images_info_file = join_path_names(args.inbasedir, './images_info.csv')
+    in_reference_keys_file = join_path_names(args.inbasedir, './referenceKeys_procimages.npy')
+    in_reference_keys_nnunet_file = join_path_names(args.inbasedir, './referenceKeys_nnUnetimages.npy')
 
-    output_dir = join_path_names(args.inbasedir, './AirwaysErrors/')
+    output_dir = join_path_names(args.inbasedir, './Labels-Errors/')
+
+    indict_reference_keys = read_dictionary(in_reference_keys_file)
+    indict_reference_keys_nnunet = read_dictionary(in_reference_keys_nnunet_file)
+
+    # def get_casename_filename(in_filename: str):
+    #     in_filename = in_filename.replace('labels', 'images')
+    #     in_reference_key = indict_reference_keys[basename_filenoext(in_filename)]
+    #     return basename(in_reference_key).replace('.nii.gz', '')
 
     def get_casename_filename(in_filename: str):
-        return basename(in_filename).replace('_manual-airways.nii.gz', '')
+        in_reference_key = indict_reference_keys_nnunet[basename_filenoext(in_filename)]
+        in_reference_key = indict_reference_keys[basename_filenoext(in_reference_key)]
+        return basename(in_reference_key).replace('.dcm', '')
+
+    # def get_airway_measures_filename(in_filename: str):
+    #     in_casename = get_casename_filename(in_filename)
+    #     return in_casename + '_ResultsPerBranch.csv'
+
+    def get_airway_measures_filename(in_filename: str):
+        in_reference_key = indict_reference_keys_nnunet[basename_filenoext(in_filename)]
+        in_casename = get_casename_filename(in_filename)
+        if 'crop-01' in in_reference_key:
+            return in_casename + '_LeftLung_ResultsPerBranch.csv'
+        elif 'crop-02' in in_reference_key:
+            return in_casename + '_RightLung_ResultsPerBranch.csv'
+        else:
+            return None
     # --------
 
     makedir(output_dir)
 
-    list_input_airway_mask_files = list_files_dir(input_airway_masks_dir)
+    list_input_airway_labels_files = list_files_dir(input_airway_labels_dir)
     # list_input_airway_measures_files = list_files_dir(input_airway_measures_dir)
 
     in_images_info = CsvFileReader.get_data(input_images_info_file)
@@ -64,38 +90,38 @@ def main(args):
 
     # **********************
 
-    for in_airway_mask_file in list_input_airway_mask_files:
-        print("\n\nInput: \'%s\'..." % (basename(in_airway_mask_file)))
-        in_casename = get_casename_filename(in_airway_mask_file)
+    for in_air_label_file in list_input_airway_labels_files:
+        print("\n\nInput: \'%s\'..." % (basename(in_air_label_file)))
+        in_casename = get_casename_filename(in_air_label_file)
 
-        in_airway_measures_file = in_casename + '_ResultsPerBranch.csv'
-        in_airway_measures_file = join_path_names(input_airway_measures_dir, in_airway_measures_file)
-        print("With measures from: \'%s\'..." % (basename(in_airway_measures_file)))
+        in_air_measures_file = get_airway_measures_filename(in_air_label_file)
+        in_air_measures_file = join_path_names(input_airway_measures_dir, in_air_measures_file)
+        print("And airway measures from: \'%s\'..." % (basename(in_air_measures_file)))
 
-        in_metadata_file = NiftiFileReader.get_image_metadata_info(in_airway_mask_file)
+        in_metadata_file = NiftiFileReader.get_image_metadata_info(in_air_label_file)
 
-        inout_airway_mask = NiftiFileReader.get_image(in_airway_mask_file)
+        inout_air_labels = NiftiFileReader.get_image(in_air_label_file)
 
         if args.is_test_error_shapes:
-            inout_airway_mask = np.ones_like(inout_airway_mask)
+            inout_air_labels = np.ones_like(inout_air_labels)
 
-        in_airway_measures_data = CsvFileReader.get_data(in_airway_measures_file)
+        in_air_measures_data = CsvFileReader.get_data(in_air_measures_file)
 
-        # in_airway_ids_branches = np.array(in_airway_measures_data['airway_ID'])
-        # in_midpoint_x_branches = np.array(in_airway_measures_data['midPoint_x'])
-        # in_midpoint_y_branches = np.array(in_airway_measures_data['midPoint_y'])
-        # in_midpoint_z_branches = np.array(in_airway_measures_data['midPoint_z'])
-        in_diameter_branches = np.array(in_airway_measures_data['d_inner_global'])
-        # in_length_branches = np.array(in_airway_measures_data['airway_length'])
-        in_generation_branches = np.array(in_airway_measures_data['generation'])
-        # in_parent_id_branches = np.array(in_airway_measures_data['parent_ID'])
-        in_children_id_branches = np.array(in_airway_measures_data['childrenID'])
-        in_begpoint_x_branches = np.array(in_airway_measures_data['begPoint_x'])
-        in_endpoint_x_branches = np.array(in_airway_measures_data['endPoint_x'])
-        in_begpoint_y_branches = np.array(in_airway_measures_data['begPoint_y'])
-        in_endpoint_y_branches = np.array(in_airway_measures_data['endPoint_y'])
-        in_begpoint_z_branches = np.array(in_airway_measures_data['begPoint_z'])
-        in_endpoint_z_branches = np.array(in_airway_measures_data['endPoint_z'])
+        # in_airway_ids_branches = np.array(in_air_measures_data['airway_ID'])
+        # in_midpoint_x_branches = np.array(in_air_measures_data['midPoint_x'])
+        # in_midpoint_y_branches = np.array(in_air_measures_data['midPoint_y'])
+        # in_midpoint_z_branches = np.array(in_air_measures_data['midPoint_z'])
+        in_diameter_branches = np.array(in_air_measures_data['d_inner_global'])
+        # in_length_branches = np.array(in_air_measures_data['airway_length'])
+        in_generation_branches = np.array(in_air_measures_data['generation'])
+        # in_parent_id_branches = np.array(in_air_measures_data['parent_ID'])
+        in_children_id_branches = np.array(in_air_measures_data['childrenID'])
+        in_begpoint_x_branches = np.array(in_air_measures_data['begPoint_x'])
+        in_endpoint_x_branches = np.array(in_air_measures_data['endPoint_x'])
+        in_begpoint_y_branches = np.array(in_air_measures_data['begPoint_y'])
+        in_endpoint_y_branches = np.array(in_air_measures_data['endPoint_y'])
+        in_begpoint_z_branches = np.array(in_air_measures_data['begPoint_z'])
+        in_endpoint_z_branches = np.array(in_air_measures_data['endPoint_z'])
 
         # in_voxelsize_image = in_images_voxelsize_info[in_casename]
         # in_voxelnorm_image = get_norm_vector(in_voxelsize_image)
@@ -211,11 +237,9 @@ def main(args):
                 #length_axis_blank = length_branch
                 length_axis_blank = max(length_axis_blank, MIN_LENGTH_ERROR_T1)
 
-                inout_airway_mask = generate_error_blank_branch_cylinder(inout_airway_mask,
-                                                                         loc_center_blank,
-                                                                         vector_axis_branch,
-                                                                         diam_base_blank,
-                                                                         length_axis_blank)
+                inout_air_labels = generate_error_blank_branch_cylinder(inout_air_labels,
+                                                                        loc_center_blank, vector_axis_branch,
+                                                                        diam_base_blank, length_axis_blank)
 
                 # ----------
                 if args.is_output_error_measures:
@@ -280,11 +304,9 @@ def main(args):
                 # length blank: distance between start blank and end of the branch
                 length_axis_blank = (1.0 - rel_pos_begin_blank) * length_branch
 
-                inout_airway_mask = generate_error_blank_branch_cylinder(inout_airway_mask,
-                                                                         loc_center_blank,
-                                                                         vector_axis_branch,
-                                                                         diam_base_blank,
-                                                                         length_axis_blank)
+                inout_air_labels = generate_error_blank_branch_cylinder(inout_air_labels,
+                                                                        loc_center_blank, vector_axis_branch,
+                                                                        diam_base_blank, length_axis_blank)
 
                 # ----------
                 if args.is_output_error_measures:
@@ -301,21 +323,21 @@ def main(args):
         # --------------------
 
         if args.is_test_error_shapes:
-            inout_airway_mask = np.ones_like(inout_airway_mask) - inout_airway_mask
+            inout_air_labels = np.ones_like(inout_air_labels) - inout_air_labels
 
         # --------------------
 
-        out_airway_error_mask_file = in_casename + '_airways-error.nii.gz'
+        out_air_label_errors_file = in_casename + '_label-errors.nii.gz'
         if args.is_test_error_shapes:
-            out_airway_error_mask_file = in_casename + '_test-error-shapes.nii.gz'
+            out_air_label_errors_file = in_casename + '_test-error-shapes.nii.gz'
 
-        out_airway_error_mask_file = join_path_names(output_dir, out_airway_error_mask_file)
-        print("Output: \'%s\'..." % (basename(out_airway_error_mask_file)))
+        out_air_label_errors_file = join_path_names(output_dir, out_air_label_errors_file)
+        print("Output: \'%s\'..." % (basename(out_air_label_errors_file)))
 
-        NiftiFileReader.write_image(out_airway_error_mask_file, inout_airway_mask, metadata=in_metadata_file)
+        NiftiFileReader.write_image(out_air_label_errors_file, inout_air_labels, metadata=in_metadata_file)
 
         if args.is_output_error_measures:
-            out_air_error_measures_file = in_casename + '_air-error-measures.csv'
+            out_air_error_measures_file = in_casename + '_error-measures.csv'
             out_air_error_measures_file = join_path_names(output_dir, out_air_error_measures_file)
             print("And: \'%s\'..." % (basename(out_air_error_measures_file)))
 
@@ -333,7 +355,7 @@ if __name__ == '__main__':
     parser.add_argument('--prop_branches_error_type2', type=float, default=0.8)
     parser.add_argument('--random_seed', type=int, default=2017)
     parser.add_argument('--is_test_error_shapes', type=bool, default=False)
-    parser.add_argument('--is_output_error_measures', type=bool, default=True)
+    parser.add_argument('--is_output_error_measures', type=bool, default=False)
     args = parser.parse_args()
 
     main(args)

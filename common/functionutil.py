@@ -1,5 +1,5 @@
 
-from typing import List, Union
+from typing import List, Dict, Union, Any
 import numpy as np
 import glob
 import os
@@ -58,6 +58,10 @@ def get_substring_filename(filename: str, pattern_search: str) -> Union[str, Non
         return sre_substring_filename.group(0)
     else:
         return None
+
+
+def read_dictionary(filename: str) -> Dict[str, Any]:
+    return dict(np.load(filename, allow_pickle=True).item())
 
 
 def handle_error_message(message: str) -> None:
