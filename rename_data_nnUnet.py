@@ -48,7 +48,7 @@ def main(args):
         makelink(join_path_names('../', in_image_file), out_image_file)
         makelink(join_path_names('../', in_label_file), out_label_file)
 
-        outdict_reference_keys[basename_filenoext(out_label_file)] = basename(in_image_file)
+        outdict_reference_keys[basename_filenoext(out_image_file)] = basename(in_image_file)
         count_image_this += 1
     # endfor
 
@@ -64,7 +64,7 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('input_datadir', type=str)
+    parser.add_argument('--input_datadir', type=str, default='.')
     args = parser.parse_args()
 
     print("Print input arguments...")

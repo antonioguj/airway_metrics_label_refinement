@@ -103,7 +103,7 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('input_basedir', type=str)
+    parser.add_argument('--input_basedir', type=str, default='.')
     # parser.add_argument('--refer_datadir', type=str, default='./ReferenceData/')
     parser.add_argument('--input_posters_dir', type=str, default='./Posteriors/')
     parser.add_argument('--output_masks_dir', type=str, default='./BinaryMasks/')
@@ -112,7 +112,7 @@ if __name__ == '__main__':
     parser.add_argument('--is_attach_coarse_airways', type=bool, default=True)
     parser.add_argument('--is_calc_connected_tree', type=bool, default=False)
     parser.add_argument('--in_connectivity_dim', type=int, default=3)
-    parser.add_argument('--is_calc_cenlines', type=bool, default=True)
+    parser.add_argument('--is_calc_cenlines', type=bool, default=False)
     parser.add_argument('--output_cenlines_dir', type=str, default='./Centrelines/')
     args = parser.parse_args()
 

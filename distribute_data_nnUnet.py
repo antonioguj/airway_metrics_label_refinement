@@ -71,7 +71,7 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('input_datadir', type=str)
+    parser.add_argument('--input_datadir', type=str, default='.')
     args = parser.parse_args()
 
     print("Print input arguments...")

@@ -121,7 +121,7 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('input_basedir', type=str)
+    parser.add_argument('--input_basedir', type=str, default='.')
     # parser.add_argument('--refer_datadir', type=str, default='./ReferenceData/')
     parser.add_argument('--input_masks_dir', type=str, default='./BinaryMasks/')
     parser.add_argument('--input_cenlines_dir', type=str, default='./Centrelines/')

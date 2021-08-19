@@ -26,34 +26,35 @@ def main(args):
     in_reference_keys_file = join_path_names(args.inbasedir, './referenceKeys_procimages.npy')
     in_reference_keys_nnunet_file = join_path_names(args.inbasedir, './referenceKeys_nnUnetimages.npy')
 
-    output_dir = join_path_names(args.inbasedir, './Labels-Errors/')
+    #output_dir = join_path_names(args.inbasedir, './Labels-Errors/')
+    output_dir = join_path_names(args.inbasedir, args.output_dir)
 
     indict_reference_keys = read_dictionary(in_reference_keys_file)
-    indict_reference_keys_nnunet = read_dictionary(in_reference_keys_nnunet_file)
-
-    # def get_casename_filename(in_filename: str):
-    #     in_filename = in_filename.replace('labels', 'images')
-    #     in_reference_key = indict_reference_keys[basename_filenoext(in_filename)]
-    #     return basename(in_reference_key).replace('.nii.gz', '')
+    #indict_reference_keys_nnunet = read_dictionary(in_reference_keys_nnunet_file)
 
     def get_casename_filename(in_filename: str):
-        in_reference_key = indict_reference_keys_nnunet[basename_filenoext(in_filename)]
-        in_reference_key = indict_reference_keys[basename_filenoext(in_reference_key)]
-        return basename(in_reference_key).replace('.dcm', '')
+        in_filename = in_filename.replace('labels', 'images')
+        in_reference_key = indict_reference_keys[basename_filenoext(in_filename)]
+        return basename(in_reference_key).replace('.nii.gz', '')
 
-    # def get_airway_measures_filename(in_filename: str):
-    #     in_casename = get_casename_filename(in_filename)
-    #     return in_casename + '_ResultsPerBranch.csv'
+    # def get_casename_filename(in_filename: str):
+    #     in_reference_key = indict_reference_keys_nnunet[basename_filenoext(in_filename)]
+    #     in_reference_key = indict_reference_keys[basename_filenoext(in_reference_key)]
+    #     return basename(in_reference_key).replace('.dcm', '')
 
     def get_airway_measures_filename(in_filename: str):
-        in_reference_key = indict_reference_keys_nnunet[basename_filenoext(in_filename)]
         in_casename = get_casename_filename(in_filename)
-        if 'crop-01' in in_reference_key:
-            return in_casename + '_LeftLung_ResultsPerBranch.csv'
-        elif 'crop-02' in in_reference_key:
-            return in_casename + '_RightLung_ResultsPerBranch.csv'
-        else:
-            return None
+        return in_casename + '_ResultsPerBranch.csv'
+
+    # def get_airway_measures_filename(in_filename: str):
+    #     in_reference_key = indict_reference_keys_nnunet[basename_filenoext(in_filename)]
+    #     in_casename = get_casename_filename(in_filename)
+    #     if 'crop-01' in in_reference_key:
+    #         return in_casename + '_LeftLung_ResultsPerBranch.csv'
+    #     elif 'crop-02' in in_reference_key:
+    #         return in_casename + '_RightLung_ResultsPerBranch.csv'
+    #     else:
+    #         return None
     # --------
 
     makedir(output_dir)
@@ -72,7 +73,7 @@ def main(args):
     # endfor
 
     if args.is_generate_error_type1:
-        print("Generate errors of Type 1: blanking small regions in random branches...")
+        print("\nGenerate errors of Type 1: blanking small regions in random branches...")
         print("Cylindres: 1) center: random position along the branch...")
         print("           2) diameter: the branch diameter (inflated %sx times)..." % (INFLATE_DIAM_ERROR_T1))
         print("           3) length: random between min. %smm and the branch length..." % (MIN_LENGTH_ERROR_T1))
@@ -260,7 +261,7 @@ def main(args):
         # *********************************************************************
 
         if args.is_generate_error_type2:
-            print('\nGenerate errors of type2: blanking partially random (most of) terminal branches...')
+            print('Generate errors of type2: blanking partially random (most of) terminal branches...')
 
             # get terminal branches, as those that have no children branches
             indexes_terminal_branches = [ibrh for ibrh, child_ids_brhs in enumerate(in_children_id_branches)
@@ -356,6 +357,11 @@ if __name__ == '__main__':
     parser.add_argument('--random_seed', type=int, default=2017)
     parser.add_argument('--is_test_error_shapes', type=bool, default=False)
     parser.add_argument('--is_output_error_measures', type=bool, default=False)
+    parser.add_argument('--output_dir', type=str, default='./Labels-Errors')
     args = parser.parse_args()
+
+    print("Print input arguments...")
+    for key, value in sorted(vars(args).items()):
+        print("\'%s\' = %s" % (key, value))
 
     main(args)
