@@ -32,10 +32,14 @@ def main(args):
     indict_reference_keys = read_dictionary(in_reference_keys_file)
     #indict_reference_keys_nnunet = read_dictionary(in_reference_keys_nnunet_file)
 
+    # def get_casename_filename(in_filename: str):
+    #     in_filename = in_filename.replace('labels', 'images')
+    #     in_reference_key = indict_reference_keys[basename_filenoext(in_filename)]
+    #     return basename(in_reference_key).replace('.nii.gz', '')
+
     def get_casename_filename(in_filename: str):
-        in_filename = in_filename.replace('labels', 'images')
-        in_reference_key = indict_reference_keys[basename_filenoext(in_filename)]
-        return basename(in_reference_key).replace('.nii.gz', '')
+        in_filename = in_filename.replace('_manual-airways', '')
+        return basename(in_filename).replace('.nii.gz', '')
 
     # def get_casename_filename(in_filename: str):
     #     in_reference_key = indict_reference_keys_nnunet[basename_filenoext(in_filename)]
