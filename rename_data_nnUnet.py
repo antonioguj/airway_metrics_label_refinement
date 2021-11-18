@@ -14,8 +14,8 @@ def main(args):
     output_labels_dir = join_path_names(args.input_datadir, './LabelsWorkData_Renamed-nnUnet/')
     out_reference_keys_file = join_path_names(args.input_datadir, 'referenceKeys_nnUnetimages.npy')
 
-    output_templ_image_filenames = 'Air_1%0.3i_0000.nii.gz'
-    output_templ_label_filenames = 'Air_1%0.3i.nii.gz'
+    output_templ_image_filenames = 'Air_2%0.3i_0000.nii.gz'
+    output_templ_label_filenames = 'Air_2%0.3i_lung.nii.gz'
     # --------
 
     makedir(output_images_dir)

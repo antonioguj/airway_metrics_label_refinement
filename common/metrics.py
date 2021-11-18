@@ -2,7 +2,7 @@
 import numpy as np
 from scipy.spatial import distance
 
-from functionutil import handle_error_message
+from common.functionutil import handle_error_message
 
 _EPS = 1.0e-7
 _SMOOTH = 1.0
