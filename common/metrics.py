@@ -2,7 +2,7 @@
 import numpy as np
 from scipy.spatial import distance
 
-from common.functionutil import handle_error_message
+from common.functionutil import handle_error_message, compute_dilated_mask
 
 _EPS = 1.0e-7
 _SMOOTH = 1.0
@@ -83,13 +83,18 @@ class AirwayCompleteness(MetricBase):
 class AirwayVolumeLeakage(MetricBase):
     _is_airway_metric = True
 
-    def __init__(self) -> None:
+    def __init__(self, is_remove_noise: bool = False) -> None:
         super(AirwayVolumeLeakage, self).__init__()
         self._name_fun_out = 'volume_leakage'
+        self._is_remove_noise = is_remove_noise
 
     def _compute_airs(self, target: np.ndarray, target_cenline: np.ndarray,
                       input: np.ndarray, input_cenline: np.ndarray) -> np.ndarray:
-        return np.sum((1.0 - target) * input) / (np.sum(target) + _SMOOTH)
+        if self._is_remove_noise:
+            target_eval = compute_dilated_mask(target, in_struct='cube')
+        else:
+            target_eval = target
+        return np.sum((1.0 - target_eval) * input) / (np.sum(target) + _SMOOTH)
 
 
 class AirwayCentrelineLeakage(MetricBase):
@@ -164,7 +169,8 @@ def get_metric(type_metric: str, **kwargs) -> MetricBase:
     elif type_metric == 'AirwayCompleteness':
         return AirwayCompleteness()
     elif type_metric == 'AirwayVolumeLeakage':
-        return AirwayVolumeLeakage()
+        is_remove_noise = kwargs['is_remove_noise'] if 'is_remove_noise' in kwargs.keys() else False
+        return AirwayVolumeLeakage(is_remove_noise=is_remove_noise)
     elif type_metric == 'AirwayCentrelineLeakage':
         return AirwayCentrelineLeakage()
     elif type_metric == 'AirwayTreeLength':

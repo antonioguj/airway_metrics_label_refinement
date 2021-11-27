@@ -112,11 +112,14 @@ if __name__ == '__main__':
     parser.add_argument('--is_attach_coarse_airways', type=bool, default=True)
     parser.add_argument('--is_calc_connected_tree', type=bool, default=False)
     parser.add_argument('--in_connectivity_dim', type=int, default=3)
-    parser.add_argument('--is_calc_cenlines', type=bool, default=False)
+    parser.add_argument('--is_calc_cenlines', type=bool, default=True)
     parser.add_argument('--output_cenlines_dir', type=str, default='./Centrelines/')
     args = parser.parse_args()
 
-    args.refer_datadir = '/mnt/mydrive/PythonCodes/Airway_segmentation/resources/THIRONA_Fullsize/'
+    # ONLY NEED TO INDICATE TWO BASE PATHS ( 1) to predicted results, 2) to reference data)
+    # args.input_basedir = '/home/antonio/Results/LabelRefinement_THIRONA/Predictions_Baseline_ANTONIO/'
+    # args.refer_datadir = '/mnt/mydrive/PythonCodes/Airway_segmentation/resources/THIRONA_Fullsize/'
+    args.refer_datadir = '/home/antonio/Data/THIRONA_Testing/'
 
     args.input_posters_dir = join_path_names(args.input_basedir, args.input_posters_dir)
     args.output_masks_dir = join_path_names(args.input_basedir, args.output_masks_dir)

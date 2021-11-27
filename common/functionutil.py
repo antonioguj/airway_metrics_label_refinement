@@ -7,7 +7,7 @@ import re
 import shutil
 import sys
 from scipy.ndimage.morphology import binary_erosion, binary_dilation
-from skimage.morphology import skeletonize_3d
+from skimage.morphology import cube, skeletonize_3d
 from skimage.measure import label
 
 
@@ -73,12 +73,16 @@ def compute_thresholded_image(in_image: np.ndarray, value_threshold: float) -> n
     return np.where(in_image > value_threshold, 1.0, 0.0).astype(np.uint8)
 
 
-def compute_eroded_mask(in_image: np.ndarray, num_iters: int) -> np.ndarray:
-    return binary_erosion(in_image, iterations=num_iters).astype(in_image.dtype)
+def compute_eroded_mask(in_image: np.ndarray, in_struct: str = None, num_iters: int = 1) -> np.ndarray:
+    if in_struct == 'cube':
+        in_struct = cube(3)
+    return binary_erosion(in_image, structure=in_struct, iterations=num_iters).astype(in_image.dtype)
 
 
-def compute_dilated_mask(in_image: np.ndarray, num_iters: int) -> np.ndarray:
-    return binary_dilation(in_image, iterations=num_iters).astype(in_image.dtype)
+def compute_dilated_mask(in_image: np.ndarray, in_struct: str = None, num_iters: int = 1) -> np.ndarray:
+    if in_struct == 'cube':
+        in_struct = cube(3)
+    return binary_dilation(in_image, structure=in_struct, iterations=num_iters).astype(in_image.dtype)
 
 
 def compute_merged_two_masks(in_image_1: np.ndarray, in_image_2: np.ndarray) -> np.ndarray:
