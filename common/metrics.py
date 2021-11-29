@@ -83,17 +83,25 @@ class AirwayCompleteness(MetricBase):
 class AirwayVolumeLeakage(MetricBase):
     _is_airway_metric = True
 
-    def __init__(self, is_remove_noise: bool = False) -> None:
+    def __init__(self) -> None:
         super(AirwayVolumeLeakage, self).__init__()
         self._name_fun_out = 'volume_leakage'
-        self._is_remove_noise = is_remove_noise
 
     def _compute_airs(self, target: np.ndarray, target_cenline: np.ndarray,
                       input: np.ndarray, input_cenline: np.ndarray) -> np.ndarray:
-        if self._is_remove_noise:
-            target_eval = compute_dilated_mask(target, in_struct='cube')
-        else:
-            target_eval = target
+        return np.sum((1.0 - target) * input) / (np.sum(target) + _SMOOTH)
+
+
+class AirwayVolumeLeakageDilatedGT(MetricBase):
+    _is_airway_metric = True
+
+    def __init__(self) -> None:
+        super(AirwayVolumeLeakageDilatedGT, self).__init__()
+        self._name_fun_out = 'volume_leakage_dil3'
+
+    def _compute_airs(self, target: np.ndarray, target_cenline: np.ndarray,
+                      input: np.ndarray, input_cenline: np.ndarray) -> np.ndarray:
+        target_eval = compute_dilated_mask(target, in_struct='cube')
         return np.sum((1.0 - target_eval) * input) / (np.sum(target) + _SMOOTH)
 
 
@@ -169,8 +177,9 @@ def get_metric(type_metric: str, **kwargs) -> MetricBase:
     elif type_metric == 'AirwayCompleteness':
         return AirwayCompleteness()
     elif type_metric == 'AirwayVolumeLeakage':
-        is_remove_noise = kwargs['is_remove_noise'] if 'is_remove_noise' in kwargs.keys() else False
-        return AirwayVolumeLeakage(is_remove_noise=is_remove_noise)
+        return AirwayVolumeLeakage()
+    elif type_metric == 'AirwayVolumeLeakageDilatedGT':
+        return AirwayVolumeLeakageDilatedGT()
     elif type_metric == 'AirwayCentrelineLeakage':
         return AirwayCentrelineLeakage()
     elif type_metric == 'AirwayTreeLength':

@@ -9,6 +9,7 @@ from common.metrics import get_metric
 LIST_CALC_METRICS_DEFAULT = ['DiceCoefficient',
                              'AirwayCompleteness',
                              'AirwayVolumeLeakage',
+                             'AirwayVolumeLeakageDilatedGT',
                              'AirwayCentrelineLeakage',
                              'AirwayTreeLength',
                              'AirwayCentrelineDistanceFalsePositiveError',
@@ -42,7 +43,7 @@ def main(args):
 
     list_metrics = OrderedDict()
     for itype_metric in args.list_type_metrics:
-        new_metric = get_metric(itype_metric, is_remove_noise=args.is_remove_noise_leakage)
+        new_metric = get_metric(itype_metric)
         list_metrics[new_metric._name_fun_out] = new_metric
     # endfor
 
@@ -129,7 +130,6 @@ if __name__ == '__main__':
     parser.add_argument('--list_type_metrics', type=str, nargs='*', default=LIST_CALC_METRICS_DEFAULT)
     parser.add_argument('--output_result_file', type=str, default='./result_metrics.csv')
     parser.add_argument('--is_remove_trachea', type=bool, default=True)
-    parser.add_argument('--is_remove_noise_leakage', type=bool, default=True)
     args = parser.parse_args()
 
     # ONLY NEED TO INDICATE TWO BASE PATHS ( 1) to predicted results, 2) to reference data)
