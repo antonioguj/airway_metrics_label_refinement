@@ -41,8 +41,8 @@ function compileMeasurements ()
         % create files structure
         files.rootName = rootName;
         files.ct                  = [files.folderCT files.rootName '.dcm'];
-        files.airways_lumen       = [files.folderOpfronted files.rootName '_inner.csv'];
-        files.airways_wall        = [files.folderOpfronted files.rootName '_inner.csv'];
+        files.lumen               = [files.folderOpfronted files.rootName '_inner.csv'];
+        files.wall                = [files.folderOpfronted files.rootName '_inner.csv'];
         files.airways_centreline  = [files.folderOpfronted files.rootName '_airways_centrelines.mat'];
         files.airways_inner_radii = [files.folderOpfronted files.rootName '_inner_localRadius.csv'];
         files.airways_outer_radii = [files.folderOpfronted files.rootName '_inner_localRadius.csv'];
@@ -107,7 +107,7 @@ function saveResultsInCSV( data, fileList, id_images_processed, templ_str_file_o
 
     str_header = ['Patient_ID, airway_ID, midPoint_x, midPoint_y, midPoint_z, ' ...
                   'd_inner_global, d_outer_global, airway_length, generation, parent_ID, childrenID, ' ...
-                  'begPoint_x, endPoint_x, begPoint_y, endPoint_y, begPoint_z, endPoint_z\n'];
+		  'begPoint_x, begPoint_y, begPoint_z, endPoint_x, endPoint_y, endPoint_z\n'];
 
     fprintf(' > Saving all airway measurements ...\n'); tic;
     
