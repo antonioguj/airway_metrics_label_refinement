@@ -1,12 +1,12 @@
 
-from typing import List, Dict, Union, Any
+from typing import List, Dict, Tuple, Union, Any
 import numpy as np
 import glob
 import os
 import re
 import shutil
 import sys
-from scipy.ndimage.morphology import binary_erosion, binary_dilation
+from scipy.ndimage.morphology import binary_fill_holes, binary_erosion, binary_dilation
 from skimage.morphology import cube, skeletonize_3d
 from skimage.measure import label
 
@@ -102,6 +102,15 @@ def compute_multiplied_two_masks(in_image_1: np.ndarray, in_image_2: np.ndarray)
 
 def compute_centrelines_mask(in_image: np.ndarray) -> np.ndarray:
     return skeletonize_3d(in_image.astype(np.uint8))
+
+
+def compute_fillholes_mask(in_image: np.ndarray) -> np.ndarray:
+    return binary_fill_holes(in_image).astype(in_image.dtype)
+
+
+def compute_connected_components(in_image: np.ndarray, connectivity_dim: int) -> Tuple[np.ndarray, int]:
+    (out_all_regions, out_num_regs) = label(in_image, connectivity=connectivity_dim, background=0, return_num=True)
+    return (out_all_regions.astype(in_image.dtype), out_num_regs)
 
 
 def compute_largest_connected_tree(in_image: np.ndarray, connectivity_dim: int) -> np.ndarray:

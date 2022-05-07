@@ -2,7 +2,7 @@
 import numpy as np
 from scipy.spatial import distance
 
-from common.functionutil import handle_error_message, compute_dilated_mask
+from common.functionutil import handle_error_message, compute_dilated_mask, compute_connected_components
 
 _EPS = 1.0e-7
 _SMOOTH = 1.0
@@ -14,6 +14,7 @@ LIST_AVAIL_METRICS = ['DiceCoefficient',
                       'AirwayTreeLength',
                       'AirwayCentrelineDistanceFalsePositiveError',
                       'AirwayCentrelineDistanceFalseNegativeError',
+                      'AirwayNumberGaps',
                       ]
 
 
@@ -171,6 +172,26 @@ class AirwayCentrelineDistanceFalseNegativeError(MetricBase):
         return np.mean(np.min(dists, axis=0))
 
 
+class AirwayNumberGaps(MetricBase):
+    _is_airway_metric = True
+
+    def __init__(self) -> None:
+        super(AirwayNumberGaps, self).__init__()
+        self._name_fun_out = 'number_gaps'
+        self._size_dilate = 1
+
+    def _compute_airs(self, target: np.ndarray, target_cenline: np.ndarray,
+                      input: np.ndarray, input_cenline: np.ndarray) -> np.ndarray:
+        target_cenline_inside_input = target_cenline * input
+        if self._size_dilate > 0:
+            target_cenline = compute_dilated_mask(target_cenline, num_iters=self._size_dilate)
+            target_cenline_inside_input = compute_dilated_mask(target_cenline_inside_input, num_iters=self._size_dilate)
+        (_, num_regions_init) = compute_connected_components(target_cenline, connectivity_dim=3)
+        (_, num_regions_withgaps) = compute_connected_components(target_cenline_inside_input, connectivity_dim=3)
+        num_gaps = num_regions_withgaps - num_regions_init
+        return np.array(num_gaps)
+
+
 def get_metric(type_metric: str, **kwargs) -> MetricBase:
     if type_metric == 'DiceCoefficient':
         return DiceCoefficient()
@@ -188,6 +209,8 @@ def get_metric(type_metric: str, **kwargs) -> MetricBase:
         return AirwayCentrelineDistanceFalsePositiveError()
     elif type_metric == 'AirwayCentrelineDistanceFalseNegativeError':
         return AirwayCentrelineDistanceFalseNegativeError()
+    elif type_metric == 'AirwayNumberGaps':
+        return AirwayNumberGaps()
     else:
         message = 'Choice Metric not found: \'%s\'. Metrics available: \'%s\'' \
                   % (type_metric, ', '.join(LIST_AVAIL_METRICS))
