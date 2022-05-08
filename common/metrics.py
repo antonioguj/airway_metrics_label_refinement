@@ -14,7 +14,8 @@ LIST_AVAIL_METRICS = ['DiceCoefficient',
                       'AirwayTreeLength',
                       'AirwayCentrelineDistanceFalsePositiveError',
                       'AirwayCentrelineDistanceFalseNegativeError',
-                      'AirwayNumberGaps',
+                      'AirwayNumberFNErrors',
+                      'AirwayNumberFNGAPErrors',
                       ]
 
 
@@ -172,23 +173,40 @@ class AirwayCentrelineDistanceFalseNegativeError(MetricBase):
         return np.mean(np.min(dists, axis=0))
 
 
-class AirwayNumberGaps(MetricBase):
+class AirwayNumberFNErrors(MetricBase):
     _is_airway_metric = True
+    _is_dilate_rm_noise = False
 
     def __init__(self) -> None:
-        super(AirwayNumberGaps, self).__init__()
-        self._name_fun_out = 'number_gaps'
-        self._size_dilate = 1
+        super(AirwayNumberFNErrors, self).__init__()
+        self._name_fun_out = 'number_fn_err'
 
     def _compute_airs(self, target: np.ndarray, target_cenline: np.ndarray,
                       input: np.ndarray, input_cenline: np.ndarray) -> np.ndarray:
-        target_cenline_inside_input = target_cenline * input
-        if self._size_dilate > 0:
-            target_cenline = compute_dilated_mask(target_cenline, num_iters=self._size_dilate)
-            target_cenline_inside_input = compute_dilated_mask(target_cenline_inside_input, num_iters=self._size_dilate)
+        if self._is_dilate_rm_noise:
+            input = compute_dilated_mask(input)
+        falseneg_target_cenline = target_cenline * (1.0 - input)
+        (_, num_errors) = compute_connected_components(falseneg_target_cenline, connectivity_dim=3)
+        return np.array(num_errors)
+
+
+class AirwayNumberFNGAPErrors(MetricBase):
+    _is_airway_metric = True
+    _is_dilate_rm_noise = False
+
+    def __init__(self) -> None:
+        super(AirwayNumberFNGAPErrors, self).__init__()
+        self._name_fun_out = 'number_fn_gap_err'
+
+    def _compute_airs(self, target: np.ndarray, target_cenline: np.ndarray,
+                      input: np.ndarray, input_cenline: np.ndarray) -> np.ndarray:
+        truepos_target_cenline = target_cenline * input
+        if self._is_dilate_rm_noise:
+            target_cenline = compute_dilated_mask(target_cenline)
+            truepos_target_cenline = compute_dilated_mask(truepos_target_cenline)
         (_, num_regions_init) = compute_connected_components(target_cenline, connectivity_dim=3)
-        (_, num_regions_withgaps) = compute_connected_components(target_cenline_inside_input, connectivity_dim=3)
-        num_gaps = num_regions_withgaps - num_regions_init
+        (_, num_regions_truepos) = compute_connected_components(truepos_target_cenline, connectivity_dim=3)
+        num_gaps = num_regions_truepos - num_regions_init
         return np.array(num_gaps)
 
 
@@ -209,8 +227,10 @@ def get_metric(type_metric: str, **kwargs) -> MetricBase:
         return AirwayCentrelineDistanceFalsePositiveError()
     elif type_metric == 'AirwayCentrelineDistanceFalseNegativeError':
         return AirwayCentrelineDistanceFalseNegativeError()
-    elif type_metric == 'AirwayNumberGaps':
-        return AirwayNumberGaps()
+    elif type_metric == 'AirwayNumberFNErrors':
+        return AirwayNumberFNErrors()
+    elif type_metric == 'AirwayNumberFNGAPErrors':
+        return AirwayNumberFNGAPErrors()
     else:
         message = 'Choice Metric not found: \'%s\'. Metrics available: \'%s\'' \
                   % (type_metric, ', '.join(LIST_AVAIL_METRICS))

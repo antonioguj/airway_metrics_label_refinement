@@ -14,7 +14,8 @@ LIST_CALC_METRICS_DEFAULT = ['DiceCoefficient',
                              'AirwayTreeLength',
                              'AirwayCentrelineDistanceFalsePositiveError',
                              'AirwayCentrelineDistanceFalseNegativeError',
-                             'AirwayNumberGaps',
+                             'AirwayNumberFNErrors',
+                             'AirwayNumberFNGAPErrors',
                              ]
 
 
