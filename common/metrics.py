@@ -179,7 +179,7 @@ class AirwayNumberFNErrors(MetricBase):
 
     def __init__(self) -> None:
         super(AirwayNumberFNErrors, self).__init__()
-        self._name_fun_out = 'number_fn_err'
+        self._name_fun_out = 'num_fn_err'
 
     def _compute_airs(self, target: np.ndarray, target_cenline: np.ndarray,
                       input: np.ndarray, input_cenline: np.ndarray) -> np.ndarray:
@@ -196,7 +196,7 @@ class AirwayNumberFNGAPErrors(MetricBase):
 
     def __init__(self) -> None:
         super(AirwayNumberFNGAPErrors, self).__init__()
-        self._name_fun_out = 'number_fn_gap_err'
+        self._name_fun_out = 'num_fn_gap_err'
 
     def _compute_airs(self, target: np.ndarray, target_cenline: np.ndarray,
                       input: np.ndarray, input_cenline: np.ndarray) -> np.ndarray:
