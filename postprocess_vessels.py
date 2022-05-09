@@ -69,10 +69,10 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--input_basedir', type=str, default='.')
-    parser.add_argument('--input_masks_dir', type=str, default='./Vessels/')
+    parser.add_argument('--input_masks_dir', type=str, default='./BinaryMasks/')
     parser.add_argument('--is_calc_connected_mask', type=bool, default=False)
     parser.add_argument('--in_connectivity_dim', type=int, default=3)
-    parser.add_argument('--output_connected_masks_dir', type=str, default='./Vessels_Connected/')
+    parser.add_argument('--output_connected_masks_dir', type=str, default='./BinMasks_Connected/')
     parser.add_argument('--is_calc_cenlines', type=bool, default=True)
     parser.add_argument('--output_cenlines_dir', type=str, default='./Centrelines/')
     args = parser.parse_args()
